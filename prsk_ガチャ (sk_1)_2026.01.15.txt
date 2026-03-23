@@ -1,0 +1,332 @@
+//prsk_ガチャ (sk_1)
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+#include<string.h>
+int  gt=1;//ガチャシステム(1.通常,2.フェス)
+//通常
+int  puc[3]={7,24,1},put[3]={1,1,1};//puc:PUキャラクター put:PUタイプ
+//フェス
+int  puc2[5]={9,4,10,7,1},put2[5]={1,4,2,2,2};////puc2:PUキャラクター put2:PUタイプ
+int  k,i,j,l,sa,bo=0,ke[10];//(k,i,j,l):カウント用 sa:最低保証 bo:ガチャボーナス ke[]:レアリティ
+char kekka[10][20],ket[10][5];//kekka[]:キャラクター ket[]:タイプ
+char cr[26][17]={"初音ミク","鏡音リン","鏡音レン","巡音ルカ","MEIKO","KAITO",
+				 "星乃 一歌","天馬 咲希","望月 穂波","日野森 志歩",
+				 "花里 みのり","桐谷 遥","桃井 愛莉","日野森 雫",
+				 "小豆沢 こはね","白石 杏","東雲 彰人","青柳 冬弥",
+				 "天馬 司","鳳 えむ","草薙 寧々","神代 類",
+				 "宵崎 奏","朝比奈 まふゆ","東雲 絵名","暁山 瑞希"},
+	 type[][5]={"cu","co","pu","ha","my"};//cu:キュート,co:クール,pu:ピュア,ha:ハッピー,my:ミステリアス
+void settei()
+{
+	printf("-設定画面-\n\n");
+	while(1)
+	{
+		while(1)
+		{
+			printf("   ■設定一覧\n1:PU変更\n2:ガチャシステム変更\n939:終了\n           -->"); scanf("%d",&k);
+			if(k==1||k==2||k==939) break;
+		}
+		if(k==1)
+		{
+			//現在表示
+			printf("\n==============================\n\n");
+			if(gt==1)
+			{
+				//通常
+				printf("現在のPU(通常)\n");
+				for(k=0;k<3;k++)
+				{
+					printf("PU:%d %13s %2s\n",k+1,cr[puc[k]-1],type[put[k]-1]);
+				}
+			}
+			if(gt==2)
+			{
+				//フェス
+				printf("現在のPU(フェス)\n");
+				for(k=0;k<5;k++)
+				{
+					printf("PU:%d %13s %2s\n",k+1,cr[puc2[k]-1],type[put2[k]-1]);
+				}
+			}
+			printf("\n==============================\n");
+			//キャラ表示
+			printf("\n-キャラクター一覧-\n");
+			for(k=0,i=1;k<26;k++,i++)
+			{
+				printf("%2d: %13s     ",k+1,cr[k]);
+				if(i==5)
+				{
+					printf("\n");
+					i=0;
+				}
+			}
+			//タイプ表示
+			printf("\n\n-タイプ一覧-\n");
+			for(k=0;k<5;k++)
+			{
+				printf("%2d: %2s     ",k+1,type[k]);
+			}
+			//変更入力
+			if(gt==1)
+			{
+				//通常
+				for(k=0;k<3;k++)
+				{
+					while(1)
+					{
+						printf("\n\nPUキャラ:%d\n     -->",k+1); scanf("%d",&puc[k]);
+						printf("  タイプ:%d\n     -->",k+1); scanf("%d",&put[k]);
+						if(puc[k]>=1&&puc[k]<=26&&put[k]>=1&&put[k]<=5) break;
+						else	 printf("範囲外の数値が入力されています。\n");
+					}
+				}
+				printf("\n==============================\n\n");
+				for(k=0;k<3;k++)
+				{
+					printf("PU:%d %13s %2s\n",k+1,cr[puc[k]-1],type[put[k]-1]);
+				}
+				printf("以下のキャラクターに変更しました。\n\n==============================\n");
+			}
+			if(gt==2)
+			{
+				//フェス
+				for(k=0;k<5;k++)
+				{
+					while(1)
+					{
+						printf("\n\nPUキャラ:%d\n     -->",k+1); scanf("%d",&puc2[k]);
+						printf("  タイプ:%d\n     -->",k+1); scanf("%d",&put2[k]);
+						if(puc2[k]>=1&&puc2[k]<=26&&put2[k]>=1&&put2[k]<=5) break;
+						else	 printf("範囲外の数値が入力されています。\n");
+					}
+				}
+				printf("\n==============================\n\n");
+				for(k=0;k<5;k++)
+				{
+					printf("PU:%d %13s %2s\n",k+1,cr[puc2[k]-1],type[put2[k]-1]);
+				}
+				printf("以下のキャラクターに変更しました。\n\n==============================\n");
+			}
+		}
+		if(k==2)
+		{
+			printf("\n-ガチャシステム変更-\n");
+			if(gt==1)	printf("   |現在:通常(星4確率3%)|\n");
+			else		printf("   |現在:フェス(星4確率6%)|\n");
+			while(1)
+			{
+				printf("1:通常\n2:フェス\n   -->"); scanf("%d",&gt);
+				if(gt==1||gt==2) break;
+			}
+			printf("\n===================================\n\n");
+			if(gt==1)printf("ガチャシステムを 通常 にしました。\n");
+			else	 printf("ガチャシステムを フェス にしました。\n");
+			printf("\n===================================\n");
+		}
+		if(k==939) break;
+	}
+	printf("設定を終了します。\n\n");
+}
+int main(void)
+{
+	srand((unsigned)time(NULL));
+	while(1)
+	{
+//選択
+		while(1)
+		{
+			printf("回数\n1:1回\n2:10回\n3:終了\n     -->"); scanf("%d",&k);
+			if(k==939) settei();
+			if(k==1||k==2||k==3) break;
+		}
+		if(k==3) break;
+//抽選
+		for(i=0,sa=0;i<10;i++)
+		{
+			if(k==1&&i==1) break;
+			bo++;
+			ke[i]=rand()%1000+1;
+			//通常確率
+			if(gt==1)
+			{
+				if(ke[i]<=30)		ke[i]=4;
+				else if(ke[i]<=115) ke[i]=3;
+				else 				ke[i]=2;
+			}
+			//フェス確率
+			else if(gt==2)
+			{
+				if(ke[i]<=60)		ke[i]=4;
+				else if(ke[i]<=145) ke[i]=3;
+				else 				ke[i]=2;
+			}
+			if(ke[i]==2) sa++;				//最低保証
+			if(sa==10) ke[9]=3;
+			if(bo==100||bo==200) ke[i]=4;	//ガチャボーナス
+			if(gt==1&&(ke[i]==4&&rand()%30+1<=12||bo==200))
+			{
+				//PU(通常)
+				kekka[i][0]=rand()%3+1;
+				switch(kekka[i][0])
+				{
+					case 1: strcpy(kekka[i],cr[puc[0]-1]); strcpy(ket[i],type[put[0]-1]); break;
+					case 2: strcpy(kekka[i],cr[puc[1]-1]); strcpy(ket[i],type[put[1]-1]); break;
+					case 3: strcpy(kekka[i],cr[puc[2]-1]); strcpy(ket[i],type[put[2]-1]); break;
+				}
+				kekka[i][18]='?';
+			}
+			else if(gt==2&&(ke[i]==4&&rand()%60+1<=20||bo==200))
+			{
+				//PU(フェス限)
+				kekka[i][0]=rand()%5+1;
+				switch(kekka[i][0])
+				{
+					case 1: strcpy(kekka[i],cr[puc2[0]-1]); strcpy(ket[i],type[put2[0]-1]); break;
+					case 2: strcpy(kekka[i],cr[puc2[1]-1]); strcpy(ket[i],type[put2[1]-1]); break;
+					case 3: strcpy(kekka[i],cr[puc2[2]-1]); strcpy(ket[i],type[put2[2]-1]); break;
+					case 4: strcpy(kekka[i],cr[puc2[3]-1]); strcpy(ket[i],type[put2[3]-1]); break;
+					case 5: strcpy(kekka[i],cr[puc2[4]-1]); strcpy(ket[i],type[put2[4]-1]); break;
+				}
+				kekka[i][18]='?';
+				printf("a\n\n\n");
+			}
+			else
+			{
+				//すり抜け
+				if(gt==1)
+				{
+					//通常PU除外
+					do
+					{
+						kekka[i][0]=rand()%26+1;
+						ket[i][0]=rand()%5+1;
+					}
+					while(kekka[i][0]==puc[0]&&ket[i][0]==put[0]||kekka[i][0]==puc[1]&&ket[i][0]==put[1]||kekka[i][0]==puc[2]&&ket[i][0]==put[2]);
+				}
+				else if(gt==2)
+				{
+					//フェスPU除外
+					do
+					{
+						kekka[i][0]=rand()%26+1;
+						ket[i][0]=rand()%5+1;
+					}
+					while(kekka[i][0]==puc2[0]&&ket[i][0]==put2[0]||kekka[i][0]==puc2[1]&&ket[i][0]==put2[1]||kekka[i][0]==puc2[2]&&ket[i][0]==put2[2]||kekka[i][0]==puc2[3]&&ket[i][0]==put2[3]||kekka[i][0]==puc2[4]&&ket[i][0]==put2[4]);
+				}
+				switch(kekka[i][0])
+				{
+					case 1: strcpy(kekka[i],cr[0]); break;
+					case 2: strcpy(kekka[i],cr[1]); break;
+					case 3: strcpy(kekka[i],cr[2]); break;
+					case 4: strcpy(kekka[i],cr[3]); break;
+					case 5: strcpy(kekka[i],cr[4]); break;
+					case 6: strcpy(kekka[i],cr[5]); break;
+					case 7: strcpy(kekka[i],cr[6]); break;
+					case 8: strcpy(kekka[i],cr[7]); break;
+					case 9: strcpy(kekka[i],cr[8]); break;
+					case 10: strcpy(kekka[i],cr[9]); break;
+					case 11: strcpy(kekka[i],cr[10]); break;
+					case 12: strcpy(kekka[i],cr[11]); break;
+					case 13: strcpy(kekka[i],cr[12]); break;
+					case 14: strcpy(kekka[i],cr[13]); break;
+					case 15: strcpy(kekka[i],cr[14]); break;
+					case 16: strcpy(kekka[i],cr[15]); break;
+					case 17: strcpy(kekka[i],cr[16]); break;
+					case 18: strcpy(kekka[i],cr[17]); break;
+					case 19: strcpy(kekka[i],cr[18]); break;
+					case 20: strcpy(kekka[i],cr[19]); break;
+					case 21: strcpy(kekka[i],cr[20]); break;
+					case 22: strcpy(kekka[i],cr[21]); break;
+					case 23: strcpy(kekka[i],cr[22]); break;
+					case 24: strcpy(kekka[i],cr[23]); break;
+					case 25: strcpy(kekka[i],cr[24]); break;
+					case 26: strcpy(kekka[i],cr[25]); break;
+				}
+				switch(ket[i][0])
+				{
+					case 1: strcpy(ket[i],type[0]); break;
+					case 2: strcpy(ket[i],type[1]); break;
+					case 3: strcpy(ket[i],type[2]); break;
+					case 4: strcpy(ket[i],type[3]); break;
+					case 5: strcpy(ket[i],type[4]); break;
+				}
+			}
+			if(bo==100) kekka[i][19]='!';
+			if(bo==200){kekka[i][19]='!';bo=0;}
+		}
+//結果表示
+		if(k!=1)
+		{
+			//10連
+			printf("ガチャ結果                                                    ガチャボーナス:%3d     \n",bo);
+			for(i=0;i<2;i++)
+			{
+				printf("---------------- ---------------- ---------------- ---------------- ---------------- \n");
+				for(j=0;j<6;j++)
+				{
+					if(i==0)l=0;
+					else	l=5;
+					for(;l<10;l++)
+					{
+						if((ke[l]==4&&j>=2)||(ke[l]==3&&j>=3)||(ke[l]==2&&j>=4))
+						{
+							if(kekka[l][18]=='?'&&j==5)
+							{
+								printf("★             * |");
+								kekka[l][18]='\0';
+							}
+							else printf("★               |");
+						}
+						else if(j==0)
+							 {
+							 	if(kekka[l][19]!='!') printf("             %s |",ket[l]);
+								else
+								{
+									printf(" ボーナス    %s |",ket[l]);
+									kekka[l][19]='\0';
+								}
+							 }
+						else if(j==1) printf("  %13s |",kekka[l]);
+						else printf("                |");
+						if(l==4) break;
+					}
+					printf("\n");
+				}
+				printf("---------------- ---------------- ---------------- ---------------- ---------------- \n");
+			}
+		}
+		else
+		{
+			//単発
+			printf("ガチャ結果                                                    ガチャボーナス:%3d     \n",bo);
+			printf("---------------- \n");
+			for(i=0;i<6;i++)
+			{
+				if((ke[0]==4&&i>=2)||(ke[0]==3&&i>=3)||(ke[0]==2&&i>=4))
+				{
+					if(kekka[0][18]=='?'&&j==5)
+					{
+						printf("★             * |");
+						kekka[0][18]='\0';
+					}
+					else printf("★               |");
+				}
+				else if(i==0)
+					 {
+					 	if(kekka[0][19]!='!') printf("             %s |",ket[0]);
+						else
+						{
+							printf(" ボーナス    %s |",ket[0]);
+							kekka[0][19]='\0';
+						}
+					 }
+				else if(i==1) printf("  %13s |",kekka[0]);
+				else printf("                |");
+				printf("\n");
+			}
+			printf("---------------- \n");
+		}
+	}
+	return 0;
+}
