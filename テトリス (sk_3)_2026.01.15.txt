@@ -1,0 +1,432 @@
+//テトリス (sk_3)
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+#include<conio.h>
+#include<windows.h>
+int main(void)
+{
+	int block_id1,block_id2,block_h;
+	int gamen[12][16]={0};
+	int i,j,l,hantei,cnt=0,kyoka=0;
+	int score=0;
+	char k;
+	srand((unsigned)time(NULL));
+	block_id1=rand()%5+1;
+	for(i=9;i<12;i++)
+			for(j=0;j<16;j++)
+				if(j!=9) gamen[i][j]=2;
+	while(1)
+	{
+		block_id2=rand()%5+1;
+		block_h=1;
+	//ブロックデータ入力
+		for(i=0;i<4;i++)
+			for(j=6;j<=9;j++)
+			{
+				if(block_id1==1&&i>=0&&i<=1&&j>=7&&j<=8) gamen[i][j]=1;							//正方
+				else if(block_id1==2&&i==0&&j==9||block_id1==2&&i==1) gamen[i][j]=1;			//エル
+				else if(block_id1==3&&j==8) gamen[i][j]=1;										//棒
+				else if(block_id1==4&&i==0&&j==8||block_id1==4&&i==1&&j>=7) gamen[i][j]=1;		//凸
+				else if(block_id1==5&&i==0&&j>=8||block_id1==5&&i==1&&j>=7&&j<=8) gamen[i][j]=1;//階段
+			}
+		while(1)
+		{
+		//画面表示
+			printf("\n          ---{ テトリス }---\n\n");
+			for(i=0;i<12;i++,printf("\n"))
+			{
+				printf("          |");
+				for(j=0;j<16;j++)
+				{
+					if(gamen[i][j]==1||gamen[i][j]==2) printf("■");
+					else printf(" ");
+				}
+				printf("|");
+				if(i==0) printf("  -next-");
+				if(i==1)
+				{
+					switch(block_id2)
+					{
+						case 1: printf("    ■■ "); break;
+						case 2: printf("      ■"); break;
+						case 3: printf("     ■ "); break;
+						case 4: printf("     ■ "); break;
+						case 5: printf("     ■■"); break;
+					}
+				}
+				if(i==2)
+				{
+					switch(block_id2)
+					{
+						case 1: printf("    ■■ "); break;
+						case 2: printf("   ■■■■"); break;
+						case 3: printf("     ■ "); break;
+						case 4: printf("    ■■■"); break;
+						case 5: printf("    ■■ "); break;
+					}
+				}
+				if(i==3)
+					if(block_id2==3) printf("     ■ ");
+				if(i==4)
+					if(block_id2==3) printf("     ■ ");
+				if(i==6)
+					printf("  --score--");
+				if(i==8)
+					printf("  %07d点",score);
+			}
+			printf("\n\n\n          A:左移動   D:右移動\n\n                S:回転\n");
+			Sleep(600);
+		//入力確認
+			if(kbhit())
+			{
+				k=getch();
+				if(k=='a'||k=='d')
+				{
+					for(i=0;i<12;i++)
+						if(k=='a'&&gamen[i][0]==1||k=='d'&&gamen[i][15]==1) break;
+				}
+				if(k=='s')
+				{
+					for(i=11;i>=0;i--)
+					{
+						for(j=0;j<16;j++)
+						{
+							if(gamen[i][j]==1) break;
+						}
+						if(j<16) break;
+					}
+					switch(block_id1)
+					{
+						case 2:	//エル
+								if(block_h==1)
+								{
+									if(i>=2&&i<=10&&gamen[i-2][j+1]==0&&gamen[i-1][j+1]==0&&gamen[i+1][j+1]==0&&gamen[i+1][j+2]==0)
+										kyoka++;
+								}
+								else if(block_h==2)
+								{
+									if(j>=1&&j<=13&&gamen[i-2][j-1]==0&&gamen[i-1][j-1]==0&&gamen[i-2][j+1]==0&&gamen[i-2][j+2]==0)
+										kyoka++;
+								}
+								else if(block_h==3)
+								{
+									if(i>=2&&i<=10&&gamen[i-2][j+1]==0&&gamen[i-2][j+2]==0&&gamen[i][j+2]==0&&gamen[i+1][j+2]==0)
+									kyoka++;
+								}
+								else if(block_h==4)
+								{
+									if(j>=2&&j<=14&&gamen[i-1][j-2]==0&&gamen[i-1][j-1]==0&&gamen[i-1][j+1]==0&&gamen[i-2][j+1]==0)
+									kyoka++;
+								}
+								break;
+						case 3:	//棒
+								if(block_h==1)
+								{
+									if(j>=2&&j<=14&&gamen[i-1][j-2]==0&&gamen[i-1][j-1]==0&&gamen[i-1][j+1]==0)
+									kyoka++;
+								}
+								else if(block_h==2)
+								{
+									if(i>=2&&i<=10&&gamen[i+1][j+1]==0&&gamen[i-1][j+1]==0&&gamen[i-2][j+1]==0)
+									kyoka++;
+								}
+								else if(block_h==3)
+								{
+									if(j>=1&&j<=13&&gamen[i-2][j-1]==0&&gamen[i-2][j+1]==0&&gamen[i-2][j+2]==0)
+									kyoka++;
+								}
+								else if(block_h==4)
+								{
+									if(i>=1&&i<=9&&gamen[i+2][j+2]==0&&gamen[i+1][j+2]==0&&gamen[i-1][j+2]==0)
+									kyoka++;
+								}
+								break;
+						case 4:	//凸
+								if(block_h==1)
+								{
+									if(i>=2&&gamen[i-1][j]==0&&gamen[i-2][j]==0)
+									kyoka++;
+								}
+								else if(block_h==2)
+								{
+									if(j<=13&&gamen[i-2][j+1]==0&&gamen[i-2][j+2]==0)
+									kyoka++;
+								}
+								else if(block_h==3)
+								{
+									if(i<=14&&gamen[i][j+1]==0&&gamen[i+1][j+1]==0)
+									kyoka++;
+								}
+								else if(block_h==4)
+								{
+									if(j>=2&&gamen[i][j-2]==0&&gamen[i][j-1]==0)
+									kyoka++;
+								}
+								break;
+						case 5:	//階段
+								if(block_h==1)
+								{
+									if(i<=10&&gamen[i-1][j]==0&&gamen[i+1][j+1]==0)
+									kyoka++;
+								}
+								else if(block_h==2)
+								{
+									if(j>=2&&gamen[i-1][j-2]==0&&gamen[i-2][j]==0)
+									kyoka++;
+								}
+								else if(block_h==3)
+								{
+									if(i>=2&&gamen[i][j+2]==0&&gamen[i-2][j+1]==0)
+									kyoka++;
+								}
+								else if(block_h==4)
+								{
+									if(j<=14&&gamen[i][j-1]==0&&gamen[i-2][j+1]==0)
+									kyoka++;
+								}
+								break;
+					}
+				}
+			}
+			if(i>=12&&cnt<2&&k=='a'||i>=12&&cnt<2&&k=='d'||k=='s'&&kyoka==1)
+			{
+			//左入力
+				if(k=='a')
+				{
+					for(i=0;i<12;i++) //可能チェック
+					{
+						for(j=0;j<16;j++)
+							if(gamen[i][j]==1&&gamen[i][j-1]==2) break;
+						if(j<16) break;
+					}
+					if(i==12)
+					for(i=0;i<12;i++) //左移動
+					{
+						for(j=0;j<16;j++)
+							if(gamen[i][j]==1&&gamen[i][j-1]!=2)
+							{
+								gamen[i][j-1]=1;
+								gamen[i][j]=0;
+							}
+					}
+				}
+			//右入力
+				else if(k=='d')
+				{
+					for(i=0;i<12;i++) //可能チェック
+					{
+						for(j=0;j<16;j++)
+							if(gamen[i][j]==1&&gamen[i][j+1]==2) break;
+						if(j<16) break;
+					}
+					if(i==12)
+					for(i=0;i<12;i++) //右移動
+					{
+						for(j=16;j>=0;j--)
+							if(gamen[i][j]==1&&gamen[i][j+1]!=2)
+							{
+								gamen[i][j+1]=1;
+								gamen[i][j]=0;
+							}
+					}
+				}
+			//回転
+				else if(k=='s')
+				{
+					switch(block_id1)
+					{
+						case 2:	//エル
+								if(block_h==1)
+								{
+									gamen[i-2][j+1]=1;	gamen[i][j]=0;
+									gamen[i-1][j+1]=1;	gamen[i][j+2]=0;
+									gamen[i+1][j+1]=1;	gamen[i][j+3]=0;
+									gamen[i+1][j+2]=1;	gamen[i-1][j+3]=0;
+									block_h++;
+								}
+								else if(block_h==2)
+								{
+									gamen[i-2][j-1]=1;	gamen[i][j]=0;
+									gamen[i-1][j-1]=1;	gamen[i][j+1]=0;
+									gamen[i-2][j+1]=1;	gamen[i-1][j]=0;
+									gamen[i-2][j+2]=1;	gamen[i-3][j]=0;
+									block_h++;
+								}
+								else if(block_h==3)
+								{
+									gamen[i-2][j+1]=1;	gamen[i][j]=0;
+									gamen[i-2][j+2]=1;	gamen[i-1][j]=0;
+									gamen[i][j+2]=1;	gamen[i-1][j+1]=0;
+									gamen[i+1][j+2]=1;	gamen[i-1][j+3]=0;
+									block_h++;
+								}
+								else if(block_h==4)
+								{
+									gamen[i-1][j-2]=1;	gamen[i][j]=0;
+									gamen[i-1][j-1]=1;	gamen[i-1][j]=0;
+									gamen[i-1][j]=1;	gamen[i-2][j]=0;
+									gamen[i-1][j+1]=1;	gamen[i-3][j]=0;
+									gamen[i-2][j+1]=1;	gamen[i-3][j-1]=0;
+									block_h=1;
+								}
+								break;
+						case 3:	//棒
+								if(block_h==1)
+								{
+									gamen[i-1][j-2]=1;	gamen[i][j]=0;
+									gamen[i-1][j-1]=1;	gamen[i-2][j]=0;
+									gamen[i-1][j+1]=1;	gamen[i-3][j]=0;
+									block_h++;
+								}
+								else if(block_h==2)
+								{
+									gamen[i+1][j+1]=1;	gamen[i][j]=0;
+									gamen[i-1][j+1]=1;	gamen[i][j+2]=0;
+									gamen[i-2][j+1]=1;	gamen[i][j+3]=0;
+									block_h++;
+								}
+								else if(block_h==3)
+								{
+									gamen[i-2][j-1]=1;	gamen[i][j]=0;
+									gamen[i-2][j+1]=1;	gamen[i-1][j]=0;
+									gamen[i-2][j+2]=1;	gamen[i-3][j]=0;
+									block_h++;
+								}
+								else if(block_h==4)
+								{
+									gamen[i+2][j+2]=1;	gamen[i][j]=0;
+									gamen[i+1][j+2]=1;	gamen[i][j+1]=0;
+									gamen[i-1][j+2]=1;	gamen[i][j+3]=0;
+									block_h=1;
+								}
+								break;
+						case 4:	//凸
+								if(block_h==1)
+								{
+									gamen[i-2][j]=1;	gamen[i][j+1]=0;
+									gamen[i-1][j]=1;	gamen[i][j+2]=0;
+									block_h++;
+								}
+								else if(block_h==2)
+								{
+									gamen[i-2][j+1]=1;	gamen[i][j]=0;
+									gamen[i-2][j+2]=1;	gamen[i-1][j]=0;
+									block_h++;
+								}
+								else if(block_h==3)
+								{
+									gamen[i][j+1]=1;	gamen[i-1][j]=0;
+									gamen[i+1][j+1]=1;	gamen[i-1][j-1]=0;
+									block_h++;
+								}
+								else if(block_h==4)
+								{
+									gamen[i][j-1]=1;	gamen[i-1][j]=0;
+									gamen[i][j-2]=1;	gamen[i-2][j]=0;
+									block_h=1;
+								}
+								break;
+						case 5:	//階段
+								if(block_h==1)
+								{
+									gamen[i+1][j+1]=1;	gamen[i-1][j+1]=0;
+									gamen[i-1][j]=1;	gamen[i-1][j+2]=0;
+									block_h++;
+								}
+								else if(block_h==2)
+								{
+									gamen[i-2][j]=1;	gamen[i][j]=0;
+									gamen[i-1][j-2]=1;	gamen[i-1][j]=0;
+									block_h++;
+								}
+								else if(block_h==3)
+								{
+									gamen[i][j+2]=1;	gamen[i][j]=0;
+									gamen[i-2][j+1]=1;	gamen[i][j+1]=0;
+									block_h++;
+								}
+								else if(block_h==4)
+								{
+									gamen[i][j-1]=1;	gamen[i-2][j-1]=0;
+									gamen[i-1][j+1]=1;	gamen[i-1][j-1]=0;
+									block_h=1;
+								}
+								break;
+					}
+					kyoka=0;
+				}
+				cnt++;
+			}
+		//ブロック降下
+			else
+			{
+				for(i=11;i>=0;i--)
+				{
+					for(j=0;j<16;j++)
+						if(gamen[i][j]==1&&gamen[i+1][j]==2||gamen[i][j]==1&&i==11) break;
+					if(j>=16)
+						for(j=0;j<16;j++)
+							if(gamen[i-1][j]==1&&gamen[i][j]==2) break;
+					if(j>=16) //降下
+					{
+						for(j=0;j<16;j++)
+							if(gamen[i][j]==1)
+							{
+								gamen[i+1][j]=1;
+								gamen[i][j]=0;
+							}
+					}
+					else //下限固定
+					{
+						for(i=0;i<12;i++)
+						{
+							for(j=16;j>=0;j--)
+								if(gamen[i][j]==1) gamen[i][j]=2;
+						}
+						break;
+					}
+				}
+				cnt=0;
+				if(i!=-1) break;
+			}
+		//一致判定
+			for(i=11;i>=0;i--)
+			{
+				for(j=0,hantei=0;j<16;j++)
+					if(gamen[i][j]==2) hantei++;
+				if(hantei==16)
+				{
+					score+=1000;
+					for(j=0;j<16;j++) //一致処理
+						gamen[i][j]=0;
+					for(l=i;l>=0;l--)  //処理分降下
+					{
+						for(j=0;j<16;j++)
+							if(gamen[l][j]==2&&gamen[l+1][j]==2&&l!=11) break;
+						if(j>=16)
+							for(j=0;j<16;j++)
+							{
+								if(gamen[l][j]==2)
+								{
+									gamen[l+1][j]=2;
+									gamen[l][j]=0;
+								}
+							}
+					}
+				}
+			}
+			k=0;
+			system("cls");
+		}
+		block_id1=block_id2;
+		system("cls");
+	//ゲームオーバー判定
+		for(i=0;i<16;i++)
+			if(gamen[0][i]==2) break;
+		if(i!=16) break;
+	}
+	printf("\n\n          | GAME OVER |\n\n");
+	printf("          | %07d点 |\n",score);
+	return 0;
+}
