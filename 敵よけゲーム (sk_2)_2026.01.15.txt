@@ -1,0 +1,122 @@
+//敵よけゲーム (sk_2)
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+#include<conio.h>
+int main(void)
+{
+	int i,j,l,n,ta=0,kill=0,s;
+	int gt_y=10,gt_x=6;
+	int e[2][10];
+	srand((unsigned)time(NULL));
+//敵数設定
+	while(1)
+	{
+		printf("敵の数(1体以上5体以下):");scanf("%d",&s);
+		if(s>=1&&s<=5) break;
+		else printf("入力した値は使えません。\n\n");
+	}
+//敵初期位置
+	while(1)
+	{
+		for(i=0;i<s;i++)
+		{
+			e[0][i]=rand()%3+1;
+			e[1][i]=rand()%11+1;
+		}
+		break;
+	}
+//メイン
+	while(1)
+	{
+	//UI
+		for(i=0;i<13;i++)
+		{
+			printf("      ");
+			for(j=0;j<13;j++)
+			{
+				if(i==0||i==12||j==0||j==12) printf("□");
+				else if(gt_y==i&&gt_x==j) printf("○");
+				else
+				{
+					for(l=0;l<s;l++)
+						if(e[0][l]==i&&e[1][l]==j){printf("△");break;}
+					if(l>=s) printf(" ");
+				}
+			}
+			printf("\n");
+		}
+		printf("経過ターン   撃破数\n\n   %d          %2d\n\n  W   |   ↑\nA S D | ← ↓ →\n\n  K   | げきは\n",ta,kill);
+	//自機操作
+		while(1)
+		{
+			if(kbhit()==1)
+			{
+				n=getch();
+				if(n=='w')		{if(gt_y>1){gt_y--;break;}}
+				else if(n=='a') {if(gt_x>1){gt_x--;break;}}
+				else if(n=='s') {if(gt_y<11){gt_y++;break;}}
+				else if(n=='d') {if(gt_x<11){gt_x++;break;}}
+				else if(n=='k')
+				{
+					for(i=0;i<s;i++)
+						if(e[0][i]==gt_y+1&&e[1][i]==gt_x||e[0][i]==gt_y-1&&e[1][i]==gt_x||e[1][i]==gt_x+1&&e[0][i]==gt_y||e[1][i]==gt_x-1&&e[0][i]==gt_y) break;
+					if(i<s)
+					{
+						e[0][i]=rand()%3+1;
+						e[1][i]=rand()%11+1;
+						kill++; break;
+					}
+				}
+			}
+		}
+	//敵操作
+		for(i=0;i<s;i++)
+		{
+			if(gt_y==e[0][i]&&gt_x==e[1][i]) break;
+			else if(gt_y==e[0][i])
+			{
+				if(gt_x>e[1][i]) e[1][i]++;
+				else			 e[1][i]--;
+			}
+			else if(gt_x==e[1][i])
+			{
+				if(gt_y>e[0][i]) e[0][i]++;
+				else			 e[0][i]--;
+			}
+			else if(gt_y*100-e[0][i]>gt_x*100-e[1][i])
+			{
+				if(gt_y>e[0][i]) e[0][i]++;
+				else			 e[0][i]--;
+			}
+			else if(gt_y*100-e[0][i]<gt_x*100-e[1][i])
+			{
+				if(gt_x>e[1][i]) e[1][i]++;
+				else			 e[1][i]--;
+			}
+		}
+		for(i=0;i<s;i++)
+		{
+			for(j=i+1;j<s;j++)
+			{
+				if(e[0][i]==e[0][j]&&e[1][i]==e[1][j])
+				{
+					e[0][i]=rand()%3+1;
+					e[1][i]=rand()%11+1;
+				}
+			}
+		}
+	//ゲームオーバーチェック
+		for(i=0;i<s;i++)
+			if(gt_y==e[0][i]&&gt_x==e[1][i]) break;
+		if(i<s)
+		{
+			system("cls");
+			printf("\n\n          -{ゲームオーバー}-\n\n         |生存ターン数:%3d|\n         |   撃破数:%3d   |\n\n",ta,kill);
+			break;
+		}
+		system("cls");
+		ta++;
+	}
+	return 0;
+}
